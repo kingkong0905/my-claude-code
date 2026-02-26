@@ -1,5 +1,5 @@
 ---
-name: kkclaude:jira-ticket-writer
+name: kkclaude:ticket-create
 description: Drafts well-structured Jira tickets in Jira wiki markup with Overview, Context, and Acceptance Criteria. Use for features, bugs, chores, and spikes.
 model: sonnet
 allowed-tools: Read, AskUserQuestion

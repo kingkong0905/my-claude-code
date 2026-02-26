@@ -1,0 +1,195 @@
+# Proposal Template (Confluence Wiki Markup)
+
+Copy this template as the starting structure for every proposal.
+Fill every section — do not leave placeholder text in the final output.
+Used in Step 4 of [SKILL.md](SKILL.md). See [sections.md](sections.md) for writing guidelines per section.
+
+---
+
+{noformat}
+h1. <Project / Proposal Title>
+
+{toc:maxLevel=3|minLevel=2|type=list|style=disc|printable=true}
+
+h2. 1. Summary
+
+- _Problem:_
+- _Proposed solution:_
+- _Expected impact:_
+
+h2. 2. Problem & Context
+
+h3. Current State
+[Short description of the system/process today]
+
+- Constraint 1
+- Constraint 2
+
+h3. Pain Points
+
+- [Pain with metric]
+- [Pain with metric]
+
+h3. Why Now
+
+- [Deadline, dependency, or strategic driver]
+
+h2. 3. Objectives & Non-Goals
+
+h3. Objectives
+
+- [Measurable objective 1]
+- [Measurable objective 2]
+
+h3. Non-Goals
+
+- [Explicit exclusion 1]
+- [Explicit exclusion 2]
+
+h2. 4. Proposed Solution (Overview)
+
+h3. Approach
+[1–2 short paragraphs accessible to non-technical readers]
+
+h3. Key Components
+
+- [Component 1]
+- [Component 2]
+
+h3. Rationale
+
+- [Why this direction]
+- [Why not the obvious alternative]
+
+h2. 5. Architecture & Design Details
+
+h3. 5.1 High-Level Architecture
+
+[1–2 sentence description of the architecture]
+
+{mermaid}
+flowchart TD
+A([Client]) --> B[API Gateway]
+B --> C[Service]
+C --> D[(Database)]
+{mermaid}
+
+h3. 5.2 Core Flows
+
+[Brief description of each flow]
+
+{mermaid}
+sequenceDiagram
+autonumber
+actor User
+participant API
+participant Service
+participant DB as Database
+
+    User->>API: [request]
+    API->>Service: [call]
+    Service->>DB: [query]
+    DB-->>Service: [result]
+    Service-->>API: [response]
+    API-->>User: [response]
+
+{mermaid}
+
+h3. 5.3 Data Model
+
+{mermaid}
+erDiagram
+ENTITY_A {
+uuid id PK
+string name
+}
+ENTITY_B {
+uuid id PK
+uuid entity_a_id FK
+}
+
+    ENTITY_A ||--o{ ENTITY_B : "has"
+
+{mermaid}
+
+h3. 5.4 Failure Modes & Recovery
+
+- [Failure scenario → recovery approach]
+
+h3. 5.5 Key Tech Decisions
+
+- _Decision:_ [choice made]
+  \*\* _Why:_
+
+h2. 6. Impact
+
+h3. Business Impact
+
+- [+ Revenue / retention / efficiency impact with magnitude]
+
+h3. Technical Impact
+
+- [+ Reliability / scalability / maintainability improvement]
+
+h3. Metrics
+
+||Metric||Current||Target||Notes||
+|[Metric name]|[Current value]|[Target value]|[Source or estimate note]|
+
+h2. 7. Risks, Trade-offs, Alternatives
+
+h3. Risks
+
+||Risk||Likelihood||Impact||Mitigation||
+|[Risk]|Low/Med/High|Low/Med/High|[Mitigation]|
+
+h3. Trade-offs
+
+- We trade [X] for [Y]
+
+h3. Alternatives Considered
+
+- _[Alternative]:_ [1–2 line description]
+  ** _Pros:_
+  ** _Cons:_
+  \*\* _Why not chosen:_
+
+h2. 8. Plan, Timeline, Resources
+
+h3. Phases
+
+# _Phase 0 – Discovery / Spike:_ [outcomes, key tasks, success criteria]
+
+# _Phase 1 – Core infra + happy path:_ [outcomes, key tasks, success criteria]
+
+# _Phase 2 – Edge cases + hardening:_ [outcomes, key tasks, success criteria]
+
+# _Phase 3 – Rollout & monitoring:_ [outcomes, key tasks, success criteria]
+
+h3. Timeline
+[Weeks/sprints — highlight critical dependencies]
+
+h3. Resources
+
+- _People:_ [roles + allocation, e.g. "2× BE, 1× FE, 0.5× DevOps for 2 sprints"]
+- _Tools/infra:_ [new services, licenses, storage, additional spend]
+- _Cross-team:_ [which teams, when]
+
+h2. 9. Decision Required
+
+We are asking for approval to:
+
+- [Clear action/commitment 1]
+- [Clear action/commitment 2]
+
+{panel:title=Options|bgColor=#DEEBFF|borderColor=#4C9AFF}
+_Option A (minimal):_ [description]
+_Option B (full scope):_ [description]
+_Option C (do nothing):_ [baseline risk or cost of inaction]
+{panel}
+
+h2. References
+
+||Title||Link||Type||Used in||
+|[Title]|[PROJ-XXX or Confluence page title\|url]|Jira / Confluence|[Section and how it was used]|
+{noformat}
