@@ -6,7 +6,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node hooks/scripts/user-prompt-submit.js"
+            "command": "bash -l -c 'node hooks/scripts/user-prompt-submit.js'"
           }
         ]
       }
@@ -17,7 +17,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node hooks/scripts/session-start.js"
+            "command": "bash -l -c 'node hooks/scripts/session-start.js'"
           }
         ]
       }
@@ -28,7 +28,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node hooks/scripts/bash-safety-check.js"
+            "command": "bash -l -c 'node hooks/scripts/bash-safety-check.js'"
           }
         ]
       }
@@ -39,7 +39,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node hooks/scripts/auto-format.js"
+            "command": "bash -l -c 'node hooks/scripts/auto-format.js'"
           }
         ]
       }
