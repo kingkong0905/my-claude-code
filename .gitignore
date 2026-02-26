@@ -1,0 +1,6 @@
+# Plugin runtime cache
+.eh-claude-code/format-cache
+.eh-claude-code/hook-perf.log
+
+# Node
+node_modules/

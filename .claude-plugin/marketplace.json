@@ -1,0 +1,8 @@
+{
+  "name": "kkclaude",
+  "display_name": "KK Claude",
+  "short_description": "Personal Claude Code plugin with custom skills, agents, and workflow automation.",
+  "categories": ["workflow", "productivity"],
+  "tags": ["workflow", "skills", "agents", "automation"],
+  "visibility": "private"
+}

@@ -1,0 +1,10 @@
+{
+  "name": "kkclaude",
+  "version": "0.1.0",
+  "author": {
+    "name": "Nguyen Truong Giang"
+  },
+  "description": "Personal Claude Code plugin with custom skills, agents, and workflow automation.",
+  "homepage": "https://github.com/kingkong0905/my-claude-code",
+  "repository": "https://github.com/kingkong0905/my-claude-code"
+}
