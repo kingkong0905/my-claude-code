@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.3.0](https://github.com/kingkong0905/my-claude-code/compare/v0.2.0...v0.3.0) (2026-02-26)
+
+
+### Features
+
+* enhance plugin documentation and add new development guidelines ([702c2da](https://github.com/kingkong0905/my-claude-code/commit/702c2dad09ddfb8f4c6f679d1e7a5de21bed8477))
+* **proposal-writer:** add proposal writing agent with structured guidelines ([28593ff](https://github.com/kingkong0905/my-claude-code/commit/28593fff7ebb77d88d0c1238e9c5ea2ffd2c5063))
+* **proposal-writer:** add proposal writing agent with structured guidelines ([f4b9620](https://github.com/kingkong0905/my-claude-code/commit/f4b962006afc78d77631122c15a9eab743f3ff90))
+
+
+### Bug Fixes
+
+* **hooks:** wrap commands in bash for improved execution context ([0182bf5](https://github.com/kingkong0905/my-claude-code/commit/0182bf5eb3096fce92e5dae43d98fbc39079afba))
+
 ## [0.2.0](https://github.com/kingkong0905/my-claude-code/compare/v0.1.0...v0.2.0) (2026-02-26)
 
 
