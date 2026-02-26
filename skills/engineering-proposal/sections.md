@@ -42,21 +42,19 @@ Reference this from Step 4 in [SKILL.md](SKILL.md).
 
 Embed Mermaid diagrams using the Confluence Mermaid macro:
 
-{noformat}
+```
 {mermaid}
 <mermaid content here>
 {mermaid}
-{noformat}
+```
 
 For code samples, use Confluence code blocks with the language specified:
 
-{noformat}
-{code:javascript}
+```javascript
 // complete, executable example — no placeholders
 const result = await client.search({ query, limit: 50 });
 console.log(result.hits); // Output: [{ id: '123', score: 0.98 }, ...]
-{code}
-{noformat}
+```
 
 ## Section 6 — Impact
 
@@ -112,25 +110,45 @@ Always use Mermaid for flows and entity relationships. Embed with the Confluence
 
 ### Flowchart (architecture overview or process flow)
 
-{noformat}
-{mermaid}
+```mermaid
+%% Search Service Architecture
 flowchart TD
 Client([Client]) --> GW[API Gateway]
 GW --> SVC[Search Service]
 SVC --> IDX[(Search Index)]
 SVC --> CACHE[(Redis Cache)]
 IDX --> DB[(PostgreSQL)]
-{mermaid}
-{noformat}
+```
 
-Node shapes: `[rect]` service/component, `([stadium])` external actor, `[(cylinder)]` database/store, `{diamond}` decision, `((circle))` event.
+**Node shapes** (per [Mermaid flowchart docs](https://mermaid.js.org/syntax/flowchart.html)):
 
-Direction: `TD` top-down (default), `LR` left-right (wide pipelines).
+| Shape      | Syntax      | Use for                      |
+| ---------- | ----------- | ---------------------------- |
+| Rectangle  | `[Label]`   | Service / component          |
+| Stadium    | `([Label])` | External actor / entry point |
+| Cylinder   | `[(Label)]` | Database / data store        |
+| Rhombus    | `{Label}`   | Decision / branch            |
+| Circle     | `((Label))` | Event / endpoint             |
+| Hexagon    | `{{Label}}` | Process / transform          |
+| Subroutine | `[[Label]]` | Subprocess / reusable block  |
+
+**Link types:**
+
+| Arrow            | Syntax            | Meaning                  |
+| ---------------- | ----------------- | ------------------------ |
+| Solid with head  | `A --> B`         | Standard directed flow   |
+| Open / no arrow  | `A --- B`         | Association              |
+| Dotted with head | `A -.-> B`        | Optional / async flow    |
+| Thick with head  | `A ==> B`         | Critical / emphasis path |
+| Labeled edge     | `A -- text --> B` | Annotated edge           |
+
+**Direction:** `TD` / `TB` top-down (same; default), `LR` left-right (wide pipelines), `BT` bottom-up, `RL` right-left.
+
+**Comments:** Use `%%` prefix — e.g. `%% This describes the diagram`.
 
 ### Sequence diagram (request/response or service interactions)
 
-{noformat}
-{mermaid}
+```mermaid
 sequenceDiagram
 autonumber
 actor User
@@ -144,16 +162,25 @@ participant DB as PostgreSQL
     DB-->>SVC: job_id
     SVC-->>API: 201 Created { id }
     API-->>User: 201 Created { id }
+```
 
-{mermaid}
-{noformat}
+**Arrow types** (per [Mermaid sequence diagram docs](https://mermaid.js.org/syntax/sequenceDiagram.html)):
 
-Use `-->>` for async/response arrows, `->>` for sync calls. Add `autonumber` for numbered steps.
+| Syntax | Line   | Arrow | Use for                          |
+| ------ | ------ | ----- | -------------------------------- |
+| `->>`  | Solid  | Head  | Synchronous call / request       |
+| `-->>` | Dotted | Head  | Response / return value          |
+| `->`   | Solid  | None  | Signal / one-way message         |
+| `-->`  | Dotted | None  | Acknowledgement / weak response  |
+| `-)`   | Solid  | Open  | Fire-and-forget / async dispatch |
+| `--x`  | Dotted | Cross | Error / rejection                |
+
+Add `autonumber` after `sequenceDiagram` to auto-number all messages.
+Use `+` / `-` suffix on arrows to activate / deactivate lifebars: `A->>+B: call` / `B-->>-A: return`.
 
 ### ERD (entity relationship diagram)
 
-{noformat}
-{mermaid}
+```mermaid
 erDiagram
 JOB {
 uuid id PK
@@ -179,15 +206,28 @@ string name
     EMPLOYER ||--o{ JOB : "posts"
     JOB ||--o{ JOB_CANDIDATE : "has"
     CANDIDATE ||--o{ JOB_CANDIDATE : "applies to"
+```
 
-{mermaid}
-{noformat}
+**Cardinality notation** (per [Mermaid ERD docs](https://mermaid.js.org/syntax/entityRelationshipDiagram.html)):
 
-Cardinality notation: `||--||` one-to-one, `||--o{` one-to-many (optional), `||--|{` one-to-many (required).
+| Left marker | Right marker | Meaning      |
+| ----------- | ------------ | ------------ |
+| `\|o`       | `o\|`        | Zero or one  |
+| `\|\|`      | `\|\|`       | Exactly one  |
+| `}o`        | `o{`         | Zero or more |
+| `}\|`       | `\|{`        | One or more  |
+
+**Relationship line:** `--` identifying (solid), `..` non-identifying (dashed).
+
+Examples:
+
+- `EMPLOYER ||--o{ JOB : "posts"` — one employer to zero-or-more jobs (identifying)
+- `JOB }|..o{ TAG : "tagged"` — one-or-more jobs to zero-or-more tags (non-identifying)
 
 ### Diagram rules
 
-- Every diagram MUST have a title comment or a preceding heading that names it
+- Every diagram MUST start with a `%%` title comment (e.g. `%% Job Application Flow`) or be preceded by a named heading
 - Keep diagrams focused — one concept per diagram; split if it becomes too wide
 - Use meaningful node labels, not abbreviations (e.g. `Job Service` not `JS`)
 - Show only what changes or is relevant to the proposal — omit unaffected systems
+- Use `%%` for any inline annotation or explanation within a diagram
