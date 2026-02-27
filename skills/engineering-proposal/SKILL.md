@@ -98,7 +98,7 @@ text ~ "<proposal topic>" ORDER BY updated DESC
 labels in ("proposal", "architecture", "tech-debt") AND text ~ "<topic>" ORDER BY updated DESC
 
 # In-flight or recently closed work on the same area
-project = <PROJECT> AND text ~ "<topic>" AND status != Done ORDER BY updated DESC
+project = <PROJECT> AND text ~ "<topic>" AND status != "Done" ORDER BY updated DESC
 ```
 
 Extract from results:

@@ -83,6 +83,36 @@ MCP servers are defined in `.mcp.json` (plugin root directory):
 - ❌ Text searches in comments/strings
 - ❌ Reading config files
 
+## Calling MCP from Hook Scripts (mcporter)
+
+Hook scripts can call MCP tools via **mcporter** — a lightweight JS runtime that auto-discovers servers from `.mcp.json`.
+
+**Setup:** `mcporter` is listed in `package.json` dependencies. Run `npm install` once.
+
+**Config:** `config/mcporter.json` imports servers from Claude Code's `.mcp.json`:
+
+```json
+{ "mcpServers": {}, "imports": ["claude-code"] }
+```
+
+**Usage in a hook script:**
+
+```js
+import { callMcp } from "./lib/mcp.js";
+
+try {
+  const result = await callMcp("atlassian", "searchJiraIssuesUsingJql", {
+    jql: 'assignee = currentUser() AND status = "In Progress" ORDER BY updated DESC',
+    maxResults: 5,
+  });
+  const issues = result?.json()?.issues ?? [];
+} catch {
+  // Not authenticated or timed out — skip
+}
+```
+
+See [hook-development.md](hook-development.md) for when MCP calls are appropriate in each hook type.
+
 ## Troubleshooting
 
 ### Atlassian MCP Not Working
