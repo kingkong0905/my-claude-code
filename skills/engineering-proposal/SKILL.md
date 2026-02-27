@@ -241,6 +241,51 @@ Extract from commit + ticket results:
 - Jira tickets linked via commit messages → treat like any other found ticket: incorporate into References, pull metrics and context into relevant sections
 - Velocity signals: frequent commits = active area; stale commits = ownership risk
 
+#### 2e — Semantic code analysis with Serena
+
+Use Serena via mcporter for symbol-level analysis of the impacted codebase. Serena is best for exact class/module names, dependency graphs, and architectural boundaries that `gh` code search cannot surface.
+
+> Serena requires no Cloud ID — it runs as a local stdio process against the project directory.
+
+**Module and symbol discovery:**
+
+```bash
+# Get a symbols overview of the impacted module or directory
+npx mcporter call serena.get_symbols_overview \
+  relative_path:'<src/relevant-module>'
+
+# Find a specific class or function and its public interface (no body needed)
+npx mcporter call serena.find_symbol \
+  name_path_pattern:'<ClassName>' \
+  include_body:false \
+  depth:1
+```
+
+**Blast radius — what depends on the impacted symbol:**
+
+```bash
+# Find all symbols that reference (depend on) this symbol
+npx mcporter call serena.find_referencing_symbols \
+  name_path_pattern:'<ClassName>' \
+  relative_path:'src/'
+```
+
+**Pattern and keyword search:**
+
+```bash
+# Search for topic-related constants, configs, or identifiers
+npx mcporter call serena.search_for_pattern \
+  pattern:'<keyword>' \
+  relative_path:'src/'
+```
+
+Extract from results:
+
+- Exact class, module, and function names → use verbatim in Sections 4 and 5 (never invent identifiers)
+- Symbol reference graph → maps blast radius of proposed changes; high-fan-in symbols = higher migration risk in Section 7
+- Directory and file layout → ground Section 5 architecture in real paths
+- Method signatures and interfaces → surfaces interface owners for Section 8 Resources; informs effort estimates
+
 #### How to use the research in the proposal
 
 | Finding                                 | Use in proposal                                                                            |
@@ -258,6 +303,9 @@ Extract from commit + ticket results:
 | Jira tickets found in commit messages   | Treat as any Jira finding — add to References; pull metrics/context into relevant sections |
 | Recurring bug-fix commits on same area  | Section 2 pain points + Section 7 risks — evidence of instability with frequency data      |
 | Commit authors / recent owners          | Section 8 Resources — identify who to involve; flag ownership gaps as risks                |
+| Symbol names from Serena overview       | Section 4 Key Components + Section 5.1 — use exact names; never invent identifiers         |
+| Symbol reference graph (blast radius)   | Section 7 risks — high fan-in symbols need dedicated migration or compatibility strategy   |
+| Method signatures / interfaces          | Section 8 Resources — surfaces interface owners; informs effort estimates                  |
 
 ### Step 3 — Gather remaining missing context (batch all questions in one message)
 
@@ -298,6 +346,7 @@ Before delivering, confirm:
 - [ ] Confluence searched for related pages; relevant pages referenced with links
 - [ ] GitHub codebase searched using gh CLI; existing services/files named correctly in Sections 4 and 5
 - [ ] GitHub commit log searched; Jira tickets found in commit messages fetched via `npx mcporter call atlassian.getJiraIssue` and added to References
+- [ ] Serena semantic analysis run on impacted modules; exact symbol names used in Sections 4 and 5; blast radius incorporated into Section 7 risks
 - [ ] Existing metrics from research used in pain points and metrics table (not invented)
 - [ ] Opening paragraph identifies audience, topic, and goal
 - [ ] Active voice throughout ("The system returns..." not "A value is returned by...")
