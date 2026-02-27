@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.6.0](https://github.com/kingkong0905/my-claude-code/compare/v0.5.0...v0.6.0) (2026-02-27)
+
+
+### Features
+
+* **docs:** enhance README and SKILL.md with Serena integration details ([acd3882](https://github.com/kingkong0905/my-claude-code/commit/acd3882e542c4188cb065f882a69a301f60342a8))
+
+
+### Bug Fixes
+
+* **docs:** remove maxResults parameter from JQL examples in SKILL.md ([8e5d17e](https://github.com/kingkong0905/my-claude-code/commit/8e5d17ef43dc8f0339aca98361e60a3e3187166b))
+
 ## [0.5.0](https://github.com/kingkong0905/my-claude-code/compare/v0.4.0...v0.5.0) (2026-02-27)
 
 
