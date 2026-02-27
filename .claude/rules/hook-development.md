@@ -64,6 +64,32 @@ Scripts live in `hooks/scripts/` and must:
 echo '{"tool_input":{"command":"rm -rf /"}}' | node hooks/scripts/bash-safety-check.js
 ```
 
+## Calling MCP Tools from Hooks (mcporter)
+
+Use the shared `hooks/scripts/lib/mcp.js` wrapper to call MCP servers (Atlassian, etc.) from hook scripts. Servers are auto-discovered from `.mcp.json` via `config/mcporter.json`.
+
+```js
+import { callMcp } from "./lib/mcp.js";
+
+// Single MCP tool call with 3 s timeout
+const result = await callMcp("atlassian", "searchJiraIssuesUsingJql", {
+  jql: 'assignee = currentUser() AND status = "In Progress" ORDER BY updated DESC',
+  maxResults: 5,
+});
+const issues = result?.json()?.issues ?? [];
+```
+
+**When to use MCP in hooks:**
+
+| Hook             | MCP calls OK? | Why                                       |
+| ---------------- | ------------- | ----------------------------------------- |
+| SessionStart     | ✅ Yes        | Fires once — latency acceptable           |
+| UserPromptSubmit | ⚠️ Careful    | Fires on every message — keep calls short |
+| PreToolUse       | ❌ No         | Fires on every tool call — must be < 1 s  |
+| PostToolUse      | ❌ No         | Same as PreToolUse                        |
+
+**Always wrap in try/catch** — mcporter is silently skipped if not installed or Atlassian is not authenticated.
+
 ## Best Practices
 
 1. **Fail fast**: Exit early with clear error messages
