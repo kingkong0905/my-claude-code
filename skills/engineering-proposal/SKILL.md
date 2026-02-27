@@ -379,28 +379,39 @@ Output the complete Confluence wiki markup so the user can paste it into a Confl
 
 > **Do NOT use `atlassian.fetch`** — that tool takes an Atlassian Resource Identifier (ARI), not a URL. Never call it with a Confluence API URL. Use only the named tools below.
 
-**Step B1 — Get the `spaceId` for the target space:**
+**Step B1 — REQUIRED: look up the numeric `spaceId` before creating any page**
 
-Use `getConfluenceSpaces` — this returns the numeric `id` needed for page creation:
+⚠️ `spaceId` is a **Long integer** (e.g. `4849664`). The space **key** (e.g. `"Eternal"`, `"ENG"`) is a string and will always fail with `INVALID_REQUEST_BODY`. You **must** call `getConfluenceSpaces` first and read the numeric `id` from the response.
 
 ```bash
 npx mcporter call atlassian.getConfluenceSpaces \
   cloudId:'<CLOUD_ID>'
 ```
 
-From the response, find the target space by its `key` or `name` and copy its `id` value (a numeric or UUID string). This is the `spaceId`.
+Example response (abbreviated):
 
-**Step B2 — Create the page:**
+```json
+{
+  "results": [
+    { "id": "4849664", "key": "Eternal", "name": "Eternal Engineering" },
+    { "id": "131073", "key": "ENG", "name": "Engineering" }
+  ]
+}
+```
+
+Find the entry whose `key` matches the target space. Use the **`id` field value** — `"4849664"` in this example — as `spaceId` in the next step.
+
+**Step B2 — Create the page using the numeric `spaceId`:**
 
 ```bash
 npx mcporter call atlassian.createConfluencePage \
   cloudId:'<CLOUD_ID>' \
-  spaceId:'<SPACE_ID>' \
+  spaceId:'4849664' \
   title:'<PROPOSAL_TITLE>' \
   content:'<CONFLUENCE_WIKI_MARKUP>'
 ```
 
-> `spaceId` is the **numeric/UUID `id`** returned by `getConfluenceSpaces` — **not** the space key string (e.g. `"ENG"` or `"Eternal"`). Using the key instead of the id will fail with a validation error.
+> Never substitute the space key or name for `spaceId`. The API accepts only the numeric `id` from step B1.
 
 ## Writing Rules
 
