@@ -31,6 +31,24 @@
             "command": "bash -l -c 'node hooks/scripts/bash-safety-check.js'"
           }
         ]
+      },
+      {
+        "matcher": "mcp__.*serena",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash -l -c 'node hooks/scripts/serena-readiness-check.js'"
+          }
+        ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash -l -c 'node hooks/scripts/serena-readiness-check.js'"
+          }
+        ]
       }
     ],
     "PostToolUse": [

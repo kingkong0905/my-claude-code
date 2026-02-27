@@ -45,9 +45,18 @@ kkclaude/
 
 ## MCP Integration (mcporter)
 
-Hook scripts call MCP tools (Atlassian/Jira) via **[mcporter](https://github.com/steipete/mcporter)** — a lightweight JS runtime that auto-discovers servers from `.mcp.json`.
+Hook scripts call MCP tools (Atlassian/Jira, Serena) via **[mcporter](https://github.com/steipete/mcporter)** — a lightweight JS runtime that auto-discovers servers from `.mcp.json`.
 
 `config/mcporter.json` uses `"imports": ["claude-code"]` so `.mcp.json` is the single source of truth — no config duplication.
+
+### Available MCP Servers
+
+| Server      | Type       | Purpose                                         |
+| ----------- | ---------- | ----------------------------------------------- |
+| `atlassian` | HTTP/OAuth | Jira, Confluence, and Compass                   |
+| `serena`    | stdio      | Semantic code navigation and editing (IDE-like) |
+
+Both are defined in `.mcp.json` and picked up automatically by mcporter via `"imports": ["claude-code"]`.
 
 ### Installation
 
@@ -63,6 +72,50 @@ Or install globally for CLI access:
 brew install steipete/tap/mcporter
 # or
 pnpm add -g mcporter
+```
+
+### Serena Setup
+
+Serena requires **[uv](https://docs.astral.sh/uv/)** to be installed (Python package manager used to run `uvx`):
+
+```bash
+brew install uv
+```
+
+Ensure `~/.mcporter/mcporter.json` contains the following entry under `mcpServers`:
+
+```json
+{
+  "mcpServers": {
+    "serena": {
+      "command": "uvx",
+      "args": [
+        "--from",
+        "git+https://github.com/oraios/serena",
+        "serena",
+        "start-mcp-server",
+        "--context",
+        "claude-code",
+        "--project-from-cwd",
+        "--open-web-dashboard",
+        "False"
+      ],
+      "description": "Serena semantic code toolkit for IDE-like code navigation and editing. Optimized for large repos (30k+ files). Use context 'claude-code' to avoid tool duplication with Claude Code built-ins."
+    }
+  }
+}
+```
+
+Serena launches on-demand via `uvx` — no further installation needed. Verify it works:
+
+```bash
+npx mcporter list serena
+```
+
+Test a Serena tool call:
+
+```bash
+npx mcporter call serena.get_symbols_overview relative_path:'src/'
 ```
 
 ### Atlassian OAuth Setup
