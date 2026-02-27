@@ -1,6 +1,6 @@
 # kkclaude
 
-Personal Claude Code plugin focused on Jira ticket drafting.
+Personal Claude Code plugin for Jira ticket drafting and engineering proposal writing.
 
 ## Structure
 
@@ -18,15 +18,17 @@ kkclaude/
 
 ## Skills (Slash Commands)
 
-| Command                 | Description                                    |
-| ----------------------- | ---------------------------------------------- |
-| `/kkclaude:jira-ticket` | Draft a Jira ticket with Overview, Context, AC |
+| Command                          | Description                                             |
+| -------------------------------- | ------------------------------------------------------- |
+| `/kkclaude:jira-ticket`          | Draft a Jira ticket with Overview, Context, AC          |
+| `/kkclaude:engineering-proposal` | Draft an engineering proposal, RFC, or architecture ADR |
 
 ## Agents
 
-| Agent                | Model  | Purpose                                |
-| -------------------- | ------ | -------------------------------------- |
-| `jira-ticket-writer` | sonnet | Draft Jira tickets in Jira wiki markup |
+| Agent                      | Model  | Purpose                                                    |
+| -------------------------- | ------ | ---------------------------------------------------------- |
+| `kkclaude:ticket-create`   | sonnet | Draft Jira tickets in Jira wiki markup                     |
+| `kkclaude:proposal-writer` | sonnet | Draft engineering proposals and architecture decision docs |
 
 ## Hooks
 
