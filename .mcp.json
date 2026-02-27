@@ -1,24 +1,3 @@
 {
-  "mcpServers": {
-    "atlassian": {
-      "type": "http",
-      "url": "https://mcp.atlassian.com/v1/mcp",
-      "description": "Official Atlassian MCP server for Jira, Confluence, and Compass (uses OAuth, no token needed)"
-    },
-    "serena": {
-      "command": "uvx",
-      "args": [
-        "--from",
-        "git+https://github.com/oraios/serena",
-        "serena",
-        "start-mcp-server",
-        "--context",
-        "claude-code",
-        "--project-from-cwd",
-        "--open-web-dashboard",
-        "False"
-      ],
-      "description": "Serena semantic code toolkit for IDE-like code navigation and editing. Optimized for large repos (30k+ files). Use context 'claude-code' to avoid tool duplication with Claude Code built-ins."
-    }
-  }
+  "mcpServers": {}
 }
