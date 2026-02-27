@@ -143,16 +143,86 @@ If nothing relevant is found, state that explicitly and proceed.
 
 For every Jira ticket or Confluence page found that is relevant, add it to the **References** section at the end of the proposal (see end of this document). Record the title, link, and one-line note on how it was used.
 
+#### 2d — Search codebase using gh CLI
+
+Before asking the user any questions, search the GitHub codebase for relevant existing code. This grounds the proposal in real implementation context and surfaces services, files, or patterns the user may not have mentioned.
+
+**Service and file discovery:**
+
+```
+# Find existing services or modules related to the topic
+gh search code "<topic>" --repo <org>/<repo> --limit 10
+
+# Find config/infra files (e.g. service definitions, CI, Helm charts)
+gh search code "<topic>" --repo <org>/<repo> --extension yml --limit 5
+gh search code "<topic>" --repo <org>/<repo> --extension tf --limit 5
+```
+
+**Related PRs (recently merged or open work):**
+
+```
+# Open PRs touching the same area
+gh pr list --repo <org>/<repo> --search "<topic>" --state open --limit 10
+
+# Recently merged PRs (last 30 days context)
+gh pr list --repo <org>/<repo> --search "<topic>" --state merged --limit 10
+```
+
+**GitHub Issues (if team also tracks work there):**
+
+```
+gh issue list --repo <org>/<repo> --search "<topic>" --state open --limit 10
+```
+
+Extract from results:
+
+- Existing services, classes, or modules that the proposal will change or depend on — use their exact names in Sections 4 and 5
+- Naming conventions for components (match the codebase, don't invent names)
+- Open or recently merged PRs that indicate in-flight work — flag as dependencies in Section 7
+- File/directory layout that should be reflected in Section 5 architecture diagrams
+- Test coverage signals (absence of test files for impacted areas → risk in Section 7)
+
+**Commit history — recent changes and Jira ticket mining:**
+
+```
+# Search recent commits touching the topic area
+gh search commits "<topic>" --repo <org>/<repo> --limit 20
+
+# Get commits for a specific file or directory
+gh api repos/<org>/<repo>/commits?path=<path/to/file>&per_page=20
+```
+
+Scan commit titles for Jira ticket references (pattern: `[A-Z]+-[0-9]+`, e.g. `PROJ-1234`). For each ticket found, call `mcp__plugin_kkclaude_atlassian__getJiraIssue` to retrieve the full ticket:
+
+```
+# Example: commit title "PROJ-1234 Fix search latency regression"
+# → fetch mcp__plugin_kkclaude_atlassian__getJiraIssue with issueIdOrKey = "PROJ-1234"
+```
+
+Extract from commit + ticket results:
+
+- Recent owners and authors of the impacted area (relevant for Section 8 Resources — who to involve)
+- Bug fix patterns (recurring fixes in the same module → Section 2 pain points, Section 7 risks)
+- Jira tickets linked via commit messages → treat like any other found ticket: incorporate into References, pull metrics and context into relevant sections
+- Velocity signals: frequent commits = active area; stale commits = ownership risk
+
 #### How to use the research in the proposal
 
-| Finding                                 | Use in proposal                                                         |
-| --------------------------------------- | ----------------------------------------------------------------------- |
-| Prior proposal on same topic            | Section 2 "Why now" — cite as prior attempt; explain what's changed     |
-| Existing Jira epic or ticket            | Section 2 pain points — link with `[PROJ-XXX]`; pull real ticket counts |
-| Architecture doc in Confluence          | Section 5.1 — link to it; describe what changes vs. what stays          |
-| Known metrics from tickets              | Section 2 pain points + Section 6 metrics table — use real numbers      |
-| In-progress related work                | Section 3 non-goals or Section 7 risks — flag the dependency            |
-| Rejected alternative recorded in ticket | Section 7 alternatives — reference it with context                      |
+| Finding                                 | Use in proposal                                                                            |
+| --------------------------------------- | ------------------------------------------------------------------------------------------ |
+| Prior proposal on same topic            | Section 2 "Why now" — cite as prior attempt; explain what's changed                        |
+| Existing Jira epic or ticket            | Section 2 pain points — link with `[PROJ-XXX]`; pull real ticket counts                    |
+| Architecture doc in Confluence          | Section 5.1 — link to it; describe what changes vs. what stays                             |
+| Known metrics from tickets              | Section 2 pain points + Section 6 metrics table — use real numbers                         |
+| In-progress related work                | Section 3 non-goals or Section 7 risks — flag the dependency                               |
+| Rejected alternative recorded in ticket | Section 7 alternatives — reference it with context                                         |
+| Existing service/module in codebase     | Section 4 Key Components + Section 5.1 — use exact names; show in architecture diagram     |
+| Open or merged PRs on the same area     | Section 7 risks — flag as in-flight dependency; link the PR                                |
+| Missing test files for impacted code    | Section 7 risks — flag test gap as an explicit risk with mitigation                        |
+| File/directory layout from codebase     | Section 5 architecture — reflect real structure, not invented names                        |
+| Jira tickets found in commit messages   | Treat as any Jira finding — add to References; pull metrics/context into relevant sections |
+| Recurring bug-fix commits on same area  | Section 2 pain points + Section 7 risks — evidence of instability with frequency data      |
+| Commit authors / recent owners          | Section 8 Resources — identify who to involve; flag ownership gaps as risks                |
 
 ### Step 3 — Gather remaining missing context (batch all questions in one message)
 
@@ -191,6 +261,8 @@ Before delivering, confirm:
 
 - [ ] Jira searched for related issues; findings incorporated or noted as not found
 - [ ] Confluence searched for related pages; relevant pages referenced with links
+- [ ] GitHub codebase searched using gh CLI; existing services/files named correctly in Sections 4 and 5
+- [ ] GitHub commit log searched; Jira tickets found in commit messages fetched via Jira MCP and added to References
 - [ ] Existing metrics from research used in pain points and metrics table (not invented)
 - [ ] Opening paragraph identifies audience, topic, and goal
 - [ ] Active voice throughout ("The system returns..." not "A value is returned by...")
