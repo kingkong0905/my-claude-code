@@ -102,20 +102,17 @@ Use `npx mcporter call` to search Jira with targeted JQL queries:
 # Related issues by keyword
 npx mcporter call atlassian.searchJiraIssuesUsingJql \
   cloudId:'<CLOUD_ID>' \
-  jql:'text ~ "<proposal topic>" ORDER BY updated DESC' \
-  maxResults:10
+  jql:'text ~ "<proposal topic>" ORDER BY updated DESC'
 
 # Related issues by label
 npx mcporter call atlassian.searchJiraIssuesUsingJql \
   cloudId:'<CLOUD_ID>' \
-  jql:'labels in ("proposal", "architecture", "tech-debt") AND text ~ "<topic>" ORDER BY updated DESC' \
-  maxResults:10
+  jql:'labels in ("proposal", "architecture", "tech-debt") AND text ~ "<topic>" ORDER BY updated DESC'
 
 # In-flight or recently closed work on the same area
 npx mcporter call atlassian.searchJiraIssuesUsingJql \
   cloudId:'<CLOUD_ID>' \
-  jql:'project = <PROJECT> AND text ~ "<topic>" AND status != "Done" ORDER BY updated DESC' \
-  maxResults:10
+  jql:'project = <PROJECT> AND text ~ "<topic>" AND status != "Done" ORDER BY updated DESC'
 ```
 
 Extract from results:
@@ -126,31 +123,32 @@ Extract from results:
 - Stakeholders already involved (assignees, reporters, commenters)
 - Failed or rejected approaches recorded in comments
 
-#### 2b — Search Confluence for related pages
+#### 2b — Search Confluence for related pages (title-first, scope-narrow)
 
-Use `npx mcporter call` to search Confluence with targeted CQL queries:
+> **Skip broad text search** — `text ~ "<topic>"` matches hundreds of loosely related pages and adds noise. Use title-targeted or structured-doc queries only.
+>
+> **CQL OR syntax rule** — never write `title ~ ("X" OR "Y")`. That is invalid CQL. Always repeat the field: `(title ~ "X" OR title ~ "Y")`.
+
+**Step 1 — Title search for prior proposals, ADRs, and architecture docs:**
 
 ```bash
-# Pages mentioning the proposal topic
+# Prior proposals or RFCs (title match — high precision)
 npx mcporter call atlassian.searchConfluenceUsingCql \
   cloudId:'<CLOUD_ID>' \
-  cql:'text ~ "<proposal topic>" AND type = page ORDER BY lastModified DESC' \
-  limit:10
-
-# ADRs and design docs in the engineering space
-npx mcporter call atlassian.searchConfluenceUsingCql \
-  cloudId:'<CLOUD_ID>' \
-  cql:'title ~ "<topic>" AND space.key = "ENG" AND type = page' \
-  limit:10
-
-# Prior proposals or RFCs
-npx mcporter call atlassian.searchConfluenceUsingCql \
-  cloudId:'<CLOUD_ID>' \
-  cql:'title ~ ("proposal" OR "RFC" OR "ADR") AND text ~ "<topic>"' \
-  limit:10
+  cql:'(title ~ "<topic>" OR title ~ "<topic keyword>") AND (title ~ "proposal" OR title ~ "RFC" OR title ~ "ADR" OR title ~ "design") AND type = page ORDER BY lastModified DESC'
 ```
 
-If a relevant page is found, fetch its full content:
+**Step 2 — Architecture docs in the engineering space (only if Step 1 returns nothing):**
+
+```bash
+# Scope to known engineering space and title-match only
+# Replace "ENG" with the actual space key for your team
+npx mcporter call atlassian.searchConfluenceUsingCql \
+  cloudId:'<CLOUD_ID>' \
+  cql:'title ~ "<topic>" AND space.key = "<SPACE_KEY>" AND type = page ORDER BY lastModified DESC'
+```
+
+**Step 3 — Fetch a page only when its title clearly matches (skip everything else):**
 
 ```bash
 npx mcporter call atlassian.getConfluencePage \
@@ -159,12 +157,15 @@ npx mcporter call atlassian.getConfluencePage \
   contentFormat:markdown
 ```
 
-Extract from results:
+> Only fetch pages whose title is a strong match. Skim the summary/excerpt from CQL results before fetching — do not fetch every result.
 
-- Existing architecture diagrams or system descriptions to reference or build on
+Extract from results (only when page is clearly relevant):
+
 - Prior proposals on the same topic — check if this is a continuation or supersedes them
-- Established constraints, SLOs, or non-negotiables documented by the team
-- Context that should be cited in Section 2 (Problem & Context) or Section 5 (Architecture)
+- Existing architecture diagrams or constraints that Section 5 should reference or build on
+- Established SLOs, non-negotiables, or decisions already made by the team
+
+If no clearly relevant pages are found, skip this step and proceed — do not force Confluence results into the proposal.
 
 #### 2c — Summarise findings for the user
 
@@ -343,7 +344,7 @@ Revise until the user confirms.
 Before delivering, confirm:
 
 - [ ] Jira searched for related issues; findings incorporated or noted as not found
-- [ ] Confluence searched for related pages; relevant pages referenced with links
+- [ ] Confluence searched using title-targeted CQL only; pages fetched only when title is a strong match; no broad text ~ searches used
 - [ ] GitHub codebase searched using gh CLI; existing services/files named correctly in Sections 4 and 5
 - [ ] GitHub commit log searched; Jira tickets found in commit messages fetched via `npx mcporter call atlassian.getJiraIssue` and added to References
 - [ ] Serena semantic analysis run on impacted modules; exact symbol names used in Sections 4 and 5; blast radius incorporated into Section 7 risks
@@ -368,7 +369,38 @@ Before delivering, confirm:
 
 ### Step 7 — Finalize
 
-Deliver the final proposal in Confluence wiki markup, ready to paste directly into a Confluence page.
+Deliver the final proposal and **ask the user** whether to publish it to Confluence or return the markup only.
+
+**Option A — Return markup only (default):**
+
+Output the complete Confluence wiki markup so the user can paste it into a Confluence page manually.
+
+**Option B — Publish to Confluence via MCP (when user confirms):**
+
+> **Do NOT use `atlassian.fetch`** — that tool takes an Atlassian Resource Identifier (ARI), not a URL. Never call it with a Confluence API URL. Use only the named tools below.
+
+**Step B1 — Get the `spaceId` for the target space:**
+
+Use `getConfluenceSpaces` — this returns the numeric `id` needed for page creation:
+
+```bash
+npx mcporter call atlassian.getConfluenceSpaces \
+  cloudId:'<CLOUD_ID>'
+```
+
+From the response, find the target space by its `key` or `name` and copy its `id` value (a numeric or UUID string). This is the `spaceId`.
+
+**Step B2 — Create the page:**
+
+```bash
+npx mcporter call atlassian.createConfluencePage \
+  cloudId:'<CLOUD_ID>' \
+  spaceId:'<SPACE_ID>' \
+  title:'<PROPOSAL_TITLE>' \
+  content:'<CONFLUENCE_WIKI_MARKUP>'
+```
+
+> `spaceId` is the **numeric/UUID `id`** returned by `getConfluenceSpaces` — **not** the space key string (e.g. `"ENG"` or `"Eternal"`). Using the key instead of the id will fail with a validation error.
 
 ## Writing Rules
 
