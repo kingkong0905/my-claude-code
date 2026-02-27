@@ -1,6 +1,6 @@
 {
   "name": "kkclaude",
-  "version": "0.5.0",
+  "version": "0.7.0",
   "private": true,
   "description": "Personal Claude Code plugin with custom skills, agents, and workflow automation.",
   "type": "module",
