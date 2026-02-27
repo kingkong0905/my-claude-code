@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.4.0](https://github.com/kingkong0905/my-claude-code/compare/v0.3.0...v0.4.0) (2026-02-27)
+
+
+### Features
+
+* **proposal-research:** add gh CLI commands for codebase exploration ([58e6152](https://github.com/kingkong0905/my-claude-code/commit/58e615242ddd191e8ddc69aa094472ba2681f3d4))
+* **proposal-research:** add gh CLI commands for codebase exploration ([daaa524](https://github.com/kingkong0905/my-claude-code/commit/daaa52467b0e063c7c6f37ebc85c76a55e22d3e8))
+
 ## [0.3.0](https://github.com/kingkong0905/my-claude-code/compare/v0.2.0...v0.3.0) (2026-02-26)
 
 
