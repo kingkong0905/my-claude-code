@@ -86,19 +86,36 @@ From the input, determine:
 
 Before asking the user any questions, search Jira and Confluence for relevant existing context. This grounds the proposal in real data and avoids duplicating prior work.
 
+> **Get your Atlassian Cloud ID first** — required for every Atlassian call below:
+>
+> ```bash
+> npx mcporter call atlassian.getAccessibleAtlassianResources
+> ```
+>
+> Copy the `id` field from the response and substitute `<CLOUD_ID>` in all commands below.
+
 #### 2a — Search Jira for related issues
 
-Call `mcp__plugin_kkclaude_atlassian__searchJiraIssuesUsingJql` with targeted JQL queries:
+Use `npx mcporter call` to search Jira with targeted JQL queries:
 
-```
+```bash
 # Related issues by keyword
-text ~ "<proposal topic>" ORDER BY updated DESC
+npx mcporter call atlassian.searchJiraIssuesUsingJql \
+  cloudId:'<CLOUD_ID>' \
+  jql:'text ~ "<proposal topic>" ORDER BY updated DESC' \
+  maxResults:10
 
 # Related issues by label
-labels in ("proposal", "architecture", "tech-debt") AND text ~ "<topic>" ORDER BY updated DESC
+npx mcporter call atlassian.searchJiraIssuesUsingJql \
+  cloudId:'<CLOUD_ID>' \
+  jql:'labels in ("proposal", "architecture", "tech-debt") AND text ~ "<topic>" ORDER BY updated DESC' \
+  maxResults:10
 
 # In-flight or recently closed work on the same area
-project = <PROJECT> AND text ~ "<topic>" AND status != "Done" ORDER BY updated DESC
+npx mcporter call atlassian.searchJiraIssuesUsingJql \
+  cloudId:'<CLOUD_ID>' \
+  jql:'project = <PROJECT> AND text ~ "<topic>" AND status != "Done" ORDER BY updated DESC' \
+  maxResults:10
 ```
 
 Extract from results:
@@ -111,20 +128,36 @@ Extract from results:
 
 #### 2b — Search Confluence for related pages
 
-Call `mcp__plugin_kkclaude_atlassian__searchConfluenceUsingCql` with targeted CQL queries:
+Use `npx mcporter call` to search Confluence with targeted CQL queries:
 
-```
+```bash
 # Pages mentioning the proposal topic
-text ~ "<proposal topic>" AND type = page ORDER BY lastModified DESC
+npx mcporter call atlassian.searchConfluenceUsingCql \
+  cloudId:'<CLOUD_ID>' \
+  cql:'text ~ "<proposal topic>" AND type = page ORDER BY lastModified DESC' \
+  limit:10
 
 # ADRs and design docs in the engineering space
-title ~ "<topic>" AND space.key = "ENG" AND type = page
+npx mcporter call atlassian.searchConfluenceUsingCql \
+  cloudId:'<CLOUD_ID>' \
+  cql:'title ~ "<topic>" AND space.key = "ENG" AND type = page' \
+  limit:10
 
 # Prior proposals or RFCs
-title ~ ("proposal" OR "RFC" OR "ADR") AND text ~ "<topic>"
+npx mcporter call atlassian.searchConfluenceUsingCql \
+  cloudId:'<CLOUD_ID>' \
+  cql:'title ~ ("proposal" OR "RFC" OR "ADR") AND text ~ "<topic>"' \
+  limit:10
 ```
 
-If a relevant page is found, call `mcp__plugin_kkclaude_atlassian__getConfluencePage` to read its full content.
+If a relevant page is found, fetch its full content:
+
+```bash
+npx mcporter call atlassian.getConfluencePage \
+  cloudId:'<CLOUD_ID>' \
+  pageId:'<PAGE_ID>' \
+  contentFormat:markdown
+```
 
 Extract from results:
 
@@ -192,11 +225,13 @@ gh search commits "<topic>" --repo <org>/<repo> --limit 20
 gh api repos/<org>/<repo>/commits?path=<path/to/file>&per_page=20
 ```
 
-Scan commit titles for Jira ticket references (pattern: `[A-Z]+-[0-9]+`, e.g. `PROJ-1234`). For each ticket found, call `mcp__plugin_kkclaude_atlassian__getJiraIssue` to retrieve the full ticket:
+Scan commit titles for Jira ticket references (pattern: `[A-Z]+-[0-9]+`, e.g. `PROJ-1234`). For each ticket found, fetch the full ticket:
 
-```
+```bash
 # Example: commit title "PROJ-1234 Fix search latency regression"
-# → fetch mcp__plugin_kkclaude_atlassian__getJiraIssue with issueIdOrKey = "PROJ-1234"
+npx mcporter call atlassian.getJiraIssue \
+  cloudId:'<CLOUD_ID>' \
+  issueIdOrKey:'PROJ-1234'
 ```
 
 Extract from commit + ticket results:
@@ -262,7 +297,7 @@ Before delivering, confirm:
 - [ ] Jira searched for related issues; findings incorporated or noted as not found
 - [ ] Confluence searched for related pages; relevant pages referenced with links
 - [ ] GitHub codebase searched using gh CLI; existing services/files named correctly in Sections 4 and 5
-- [ ] GitHub commit log searched; Jira tickets found in commit messages fetched via Jira MCP and added to References
+- [ ] GitHub commit log searched; Jira tickets found in commit messages fetched via `npx mcporter call atlassian.getJiraIssue` and added to References
 - [ ] Existing metrics from research used in pain points and metrics table (not invented)
 - [ ] Opening paragraph identifies audience, topic, and goal
 - [ ] Active voice throughout ("The system returns..." not "A value is returned by...")
