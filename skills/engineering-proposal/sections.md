@@ -34,11 +34,105 @@ Reference this from Step 4 in [SKILL.md](SKILL.md).
 
 ## Section 5 — Architecture & Design Details
 
-- _5.1 High-level architecture_: short text + Mermaid `flowchart` showing top-level components and their relationships
-- _5.2 Core flows_: ALWAYS draw a Mermaid diagram for each primary flow — use `flowchart` for process/data flows, `sequenceDiagram` for request/response interactions
-- _5.3 Data model_: ALWAYS draw a Mermaid `erDiagram` for any entity relationships, new tables, fields, or schema changes
-- _5.4 Failure modes & recovery_: downtime, partial failure, data corruption handling
-- _5.5 Tech decisions_: notable library, infra, or pattern choices — 2–3 bullet justification each
+Section 5 is the most technically demanding section. Every subsection must contain real, implementation-level detail drawn from codebase research — no placeholders, no vague descriptions.
+
+- _5.1 High-level architecture_: short text + Mermaid `flowchart` showing top-level components and their relationships. Use exact service/module names from the codebase.
+- _5.2 Core flows_: ALWAYS draw a Mermaid diagram for each primary flow — use `flowchart` for process/data flows, `sequenceDiagram` for request/response interactions. Include actual method/endpoint names.
+- _5.3 Data model_: ALWAYS draw a Mermaid `erDiagram` for any entity relationships, new tables, fields, or schema changes. Include column names, types, PKs, FKs.
+- _5.4 Failure modes & recovery_: downtime, partial failure, data corruption handling. Specify detection mechanism (alert/log/monitor) and recovery procedure.
+- _5.5 Tech decisions_: notable library, infra, or pattern choices — 2–3 bullet justification each. Cite alternatives considered.
+
+### 5.6 API Contracts & Interface Changes
+
+Required for any proposal that adds, changes, or removes an API endpoint or inter-service interface:
+
+- List every endpoint added/changed/removed: `METHOD /path` → request schema → response schema
+- Include HTTP status codes, auth requirements, rate limits
+- For gRPC: show proto message definitions
+- For events/messages: show topic name, schema, producer, consumer
+- Flag any breaking changes and the migration path for existing consumers
+
+Example (REST):
+
+```
+POST /api/v2/jobs/search
+Auth: Bearer token (employer scope)
+Request:  { query: string, filters: { location?: string, salary_min?: number }, page: number }
+Response: 200 { results: Job[], total: number, cursor: string }
+          400 { error: "INVALID_FILTER", field: string }
+          429 { retry_after: number }
+```
+
+### 5.7 Database & Infrastructure Changes
+
+Required for any proposal that modifies data storage or infrastructure:
+
+- Schema changes: show SQL DDL (or ORM migration equivalent) for new/modified tables, columns, indexes
+- Migration strategy: forward-only or reversible; zero-downtime approach (backfill, dual-write, feature flag)
+- New infrastructure: service name, hosting (e.g. AWS region, ECS task), estimated cost/month, scaling policy
+- Config/environment variables added or changed — include key name, type, where it's set
+- Dependency additions: package/service name + version + justification
+
+Example (migration):
+
+```sql
+-- Migration: add search_vector column with GIN index for full-text search
+ALTER TABLE jobs ADD COLUMN search_vector tsvector;
+CREATE INDEX CONCURRENTLY idx_jobs_search_vector ON jobs USING GIN(search_vector);
+-- Backfill: run as background job, ~4h for 10M rows at 500 rows/s
+UPDATE jobs SET search_vector = to_tsvector('english', title || ' ' || description)
+WHERE search_vector IS NULL;
+```
+
+### 5.8 Observability & Monitoring
+
+Required for every proposal — new systems must be observable from day one:
+
+- _Metrics_: list new metrics to emit (name, type: counter/gauge/histogram, label set)
+- _Logs_: key log events and their structured fields (e.g. `job_search_executed { query_id, duration_ms, result_count }`)
+- _Traces_: new spans added to distributed traces; parent–child relationships
+- _Alerts_: at least one alert per risk identified in Section 7 — threshold, severity, on-call runbook link
+- _Dashboards_: describe what the on-call engineer would look at to confirm the system is healthy
+
+### 5.9 Testing Strategy
+
+Required for every proposal:
+
+- _Unit tests_: which new classes/functions need unit tests; notable edge cases
+- _Integration tests_: which service boundaries need integration coverage; test environment requirements
+- _E2E / contract tests_: critical user flows to cover; consumer-driven contract tests for API changes
+- _Load / performance tests_: baseline and target metrics from Section 6; tool (k6, Gatling, etc.); acceptance threshold
+- _Rollback test_: how the team will verify the rollback procedure works before going to production
+
+### 5.10 Change Impact Assessment
+
+Required for every proposal. Map every factor the proposal touches and rate its impact severity.
+
+**Impact levels:**
+
+| Level    | Definition                                                                                                   |
+| -------- | ------------------------------------------------------------------------------------------------------------ |
+| Critical | Breaking change, data loss risk, or system outage possible — requires dedicated mitigation plan and sign-off |
+| High     | Significant behaviour change for users or downstream systems — requires thorough testing and staged rollout  |
+| Medium   | Noticeable change but contained in scope — standard testing and monitoring sufficient                        |
+| Low      | Minimal or no observable change — cosmetic, additive only, or fully backward-compatible                      |
+
+**Factor categories to evaluate** — assess every row; write "Not affected" only when you have confirmed it is unchanged:
+
+| Factor                      | Affected component(s)                       | Nature of change                                   | Impact level                   | Explanation & mitigation                                  |
+| --------------------------- | ------------------------------------------- | -------------------------------------------------- | ------------------------------ | --------------------------------------------------------- |
+| User flows                  | [flow names]                                | [added / changed / removed]                        | Critical / High / Medium / Low | [what breaks or changes for the user; rollback plan]      |
+| Data model / ERD            | [entity names]                              | [new table / column / relationship / removed]      | ...                            | [schema delta; data migration risk]                       |
+| Database                    | [table / index / query names]               | [DDL change / query pattern / volume]              | ...                            | [performance risk; lock risk; backfill estimate]          |
+| API / service interface     | [endpoint or service name]                  | [added / changed / deprecated / removed]           | ...                            | [consumer impact; versioning strategy]                    |
+| Background jobs / queues    | [job or queue name]                         | [new / changed payload / removed]                  | ...                            | [in-flight message handling; idempotency]                 |
+| Infrastructure / deployment | [service / config / env var]                | [new dependency / scaling change / cost]           | ...                            | [rollout sequence; infra provisioning lead time]          |
+| Security & auth             | [auth scope / permission / data boundary]   | [new access / changed scope / data exposure]       | ...                            | [security review required? blast radius if misconfigured] |
+| Performance & scalability   | [endpoint / query / job]                    | [added load / changed complexity / new bottleneck] | ...                            | [p95 latency delta; throughput change; load test result]  |
+| External integrations       | [third-party service / webhook / event bus] | [new contract / changed payload / removed]         | ...                            | [partner notification required? SLA impact]               |
+| Operations / on-call        | [runbook / alert / dashboard]               | [new alert / changed threshold / new runbook]      | ...                            | [on-call burden delta; training needed?]                  |
+
+> Ground every rating in evidence from the codebase research (Serena blast radius, Jira tickets, recent commits). A "Low" rating with no explanation is rejected at review. If a factor is genuinely not affected, state why in the explanation column.
 
 Embed Mermaid diagrams using the Confluence Mermaid macro:
 
@@ -48,7 +142,7 @@ Embed Mermaid diagrams using the Confluence Mermaid macro:
 {mermaid}
 ```
 
-For code samples, use Confluence code blocks with the language specified:
+For code samples, use Confluence code blocks with the language specified — complete, runnable examples only, no placeholders:
 
 ```javascript
 // complete, executable example — no placeholders

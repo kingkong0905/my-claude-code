@@ -114,12 +114,88 @@ uuid entity_a_id FK
 
 h3. 5.4 Failure Modes & Recovery
 
-- [Failure scenario → recovery approach]
+||Failure scenario||Detection||Recovery||
+|[scenario]|[alert / log / monitor]|[procedure]|
 
 h3. 5.5 Key Tech Decisions
 
 - _Decision:_ [choice made]
-  \*\* _Why:_
+  ** _Why:_ [justification]
+  ** _Alternatives ruled out:_ [option A, option B]
+
+h3. 5.6 API Contracts & Interface Changes
+
+_New / changed endpoints:_
+
+{code:none}
+[METHOD] /path/to/endpoint
+Auth: [auth scheme + required scope]
+Request: { [field]: [type], ... }
+Response: [status] { [field]: [type], ... }
+[error status] { error: "[CODE]", ... }
+{code}
+
+_Breaking changes:_ [list any; migration path for existing consumers]
+
+h3. 5.7 Database & Infrastructure Changes
+
+_Schema changes:_
+
+{code:sql}
+-- [description of change]
+[SQL DDL or ORM migration snippet]
+{code}
+
+_Migration strategy:_ [zero-downtime approach; backfill plan; estimated duration]
+
+_New infrastructure:_
+
+||Component||Hosting||Estimated cost/month||Scaling policy||
+|[service]|[platform / region]|[cost]|[policy]|
+
+_New config / environment variables:_
+
+||Key||Type||Default||Where set||
+|[KEY_NAME]|[type]|[default]|[location]|
+
+h3. 5.8 Observability & Monitoring
+
+_Metrics:_
+
+||Metric name||Type||Labels||
+|[metric_name]|counter / gauge / histogram|[label_key=value, ...]|
+
+_Key log events:_
+
+- `[event_name]` — fields: [field1, field2, ...]
+
+_Alerts:_
+
+||Alert||Threshold||Severity||Runbook||
+|[alert name]|[condition]|P1 / P2 / P3|[link or TBD]|
+
+h3. 5.9 Testing Strategy
+
+||Test type||Scope||Tool||Acceptance threshold||
+|Unit|[classes / functions]|[framework]|[coverage or pass rate]|
+|Integration|[service boundaries]|[framework]|[pass rate]|
+|E2E / contract|[critical flows]|[tool]|[pass rate]|
+|Load / perf|[endpoint or flow]|[tool]|[target from §6 metrics table]|
+|Rollback|[procedure to verify]|Manual|Verified before prod|
+
+h3. 5.10 Change Impact Assessment
+
+||Factor||Affected component(s)||Nature of change||Impact level||Explanation & mitigation||
+|User flows|[flow names]|[added / changed / removed]|Critical / High / Medium / Low|[what changes for users; rollback plan]|
+|Data model / ERD|[entity names]|[new table / column / relationship / removed]|Critical / High / Medium / Low|[schema delta; migration risk]|
+|Database|[table / index / query]|[DDL change / query pattern / volume]|Critical / High / Medium / Low|[lock risk; perf impact; backfill estimate]|
+|API / service interface|[endpoint or service]|[added / changed / deprecated / removed]|Critical / High / Medium / Low|[consumer impact; versioning strategy]|
+|Background jobs / queues|[job or queue name]|[new / changed payload / removed]|Critical / High / Medium / Low|[in-flight handling; idempotency]|
+|Infrastructure / deployment|[service / config / env var]|[new dependency / scaling / cost]|Critical / High / Medium / Low|[rollout sequence; provisioning lead time]|
+|Security & auth|[auth scope / permission]|[new access / changed scope / data exposure]|Critical / High / Medium / Low|[security review needed? blast radius]|
+|Performance & scalability|[endpoint / query / job]|[added load / changed complexity]|Critical / High / Medium / Low|[p95 delta; throughput change; load test]|
+|External integrations|[third-party / webhook / event]|[new contract / changed payload / removed]|Critical / High / Medium / Low|[partner notification; SLA impact]|
+|Operations / on-call|[runbook / alert / dashboard]|[new alert / changed threshold]|Critical / High / Medium / Low|[on-call burden delta; training needed]|
 
 h2. 6. Impact
 

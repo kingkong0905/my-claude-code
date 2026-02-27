@@ -329,6 +329,23 @@ See [sections.md](sections.md) for detailed section-by-section guidelines, Merma
 
 Use [template.md](template.md) as the starting structure — fill every section, then expand.
 
+**Section 5 technical depth requirements** — Section 5 must contain implementation-level detail. Never leave these as vague descriptions:
+
+| Subsection             | Required content                                                                                                                                                                                                                      |
+| ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 5.1 Architecture       | Mermaid flowchart with exact service/module names from codebase                                                                                                                                                                       |
+| 5.2 Core flows         | Mermaid sequence or flow diagram per primary flow; actual endpoint/method names                                                                                                                                                       |
+| 5.3 Data model         | Mermaid ERD with column names, types, PK/FK; every new or changed table                                                                                                                                                               |
+| 5.4 Failure modes      | Table: scenario → detection mechanism → recovery procedure                                                                                                                                                                            |
+| 5.5 Tech decisions     | Choice + 2–3 bullet justification + alternatives ruled out                                                                                                                                                                            |
+| 5.6 API contracts      | Every new/changed endpoint: METHOD, path, request schema, response schema, error codes, auth                                                                                                                                          |
+| 5.7 DB & infra changes | SQL DDL/migration snippet; zero-downtime strategy; new infra cost; new env vars                                                                                                                                                       |
+| 5.8 Observability      | New metrics (name/type/labels), key log events, alerts with thresholds, dashboard description                                                                                                                                         |
+| 5.9 Testing strategy   | Table: unit / integration / E2E / load / rollback — scope, tool, acceptance threshold                                                                                                                                                 |
+| 5.10 Impact assessment | Table covering all 10 factors (flows, ERD, DB, API, jobs, infra, security, perf, integrations, ops) — each rated Critical / High / Medium / Low with explanation grounded in codebase research; "Not affected" requires justification |
+
+If a subsection does not apply (e.g. no API changes), write "N/A — [reason]" rather than omitting it.
+
 ### Step 5 — Review with user
 
 Present the draft and ask:
@@ -362,9 +379,15 @@ Before delivering, confirm:
 - [ ] Output is Confluence wiki markup — no Markdown syntax
 - [ ] Code blocks use `{code:language}...{code}`
 - [ ] Tables use `||header||` / `|row|` format
-- [ ] Section 5.1 has a Mermaid `flowchart` for the high-level architecture
-- [ ] Section 5.2 has a Mermaid `flowchart` or `sequenceDiagram` for each core flow
-- [ ] Section 5.3 has a Mermaid `erDiagram` for any entity relationships or schema changes
+- [ ] Section 5.1 has a Mermaid `flowchart` with exact service/module names from codebase research
+- [ ] Section 5.2 has a Mermaid `flowchart` or `sequenceDiagram` per primary flow with actual endpoint/method names
+- [ ] Section 5.3 has a Mermaid `erDiagram` with column names, types, PK/FK for every new or changed table
+- [ ] Section 5.4 failure modes table: scenario → detection → recovery (not vague bullet points)
+- [ ] Section 5.6 API contracts: every new/changed endpoint with METHOD, path, request/response schema, error codes, auth
+- [ ] Section 5.7 DB & infra: SQL DDL or migration snippet present; zero-downtime strategy explained; new env vars listed
+- [ ] Section 5.8 observability: new metrics listed with name/type/labels; at least one alert per Section 7 risk
+- [ ] Section 5.9 testing strategy table present: unit / integration / E2E / load / rollback
+- [ ] Section 5.10 change impact assessment table present: all 10 factors evaluated (flows, ERD, DB, API, jobs, infra, security, perf, integrations, ops); every row has an impact level (Critical/High/Medium/Low) and a non-empty explanation; no unsupported "Not affected" entries
 - [ ] All Mermaid blocks use `{mermaid}...{mermaid}` macro syntax
 
 ### Step 7 — Finalize
