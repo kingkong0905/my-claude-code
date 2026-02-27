@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.5.0](https://github.com/kingkong0905/my-claude-code/compare/v0.4.0...v0.5.0) (2026-02-27)
+
+
+### Features
+
+* **query-status:** add mcporter dependency and update query status formatting ([edbe493](https://github.com/kingkong0905/my-claude-code/commit/edbe49379880761e749e5dfff96f5670375671a2))
+* **docs:** enhance README description and add engineering proposal command ([1e13c3c](https://github.com/kingkong0905/my-claude-code/commit/1e13c3cd166b23acce568d90c7b906352a494c7d))
+* **proposal-research:** update SKILL.md documentation ([f49d5b1](https://github.com/kingkong0905/my-claude-code/commit/f49d5b1f4e9ef2edeeee0c29b501c5d1661c9060))
+
 ## [0.4.0](https://github.com/kingkong0905/my-claude-code/compare/v0.3.0...v0.4.0) (2026-02-27)
 
 
