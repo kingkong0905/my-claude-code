@@ -1,5 +1,26 @@
 # Changelog
 
+## [0.8.0](https://github.com/kingkong0905/my-claude-code/compare/v0.7.0...v0.8.0) (2026-02-27)
+
+
+### Features
+
+* add initial changelog with version 0.1.0 and features listed ([d3b11f1](https://github.com/kingkong0905/my-claude-code/commit/d3b11f1b9211b92c6db2d5c5fe8a5b6104ac1ac4))
+* add Jira ticket skill and templates for structured reporting ([e6c669d](https://github.com/kingkong0905/my-claude-code/commit/e6c669d157801fab44070ddae6ae99e2255000a5))
+* Bump version ([fa99671](https://github.com/kingkong0905/my-claude-code/commit/fa99671c00c739d05cf6c6a6a76962e7e3dd7282))
+* **docs:** enhance README and SKILL.md with Serena integration details ([acd3882](https://github.com/kingkong0905/my-claude-code/commit/acd3882e542c4188cb065f882a69a301f60342a8))
+* enhance plugin documentation and add new development guidelines ([702c2da](https://github.com/kingkong0905/my-claude-code/commit/702c2dad09ddfb8f4c6f679d1e7a5de21bed8477))
+* **proposal-research:** add gh CLI commands for codebase exploration ([58e6152](https://github.com/kingkong0905/my-claude-code/commit/58e615242ddd191e8ddc69aa094472ba2681f3d4))
+* **proposal-research:** add gh CLI commands for codebase exploration ([daaa524](https://github.com/kingkong0905/my-claude-code/commit/daaa52467b0e063c7c6f37ebc85c76a55e22d3e8))
+* **proposal-writer:** add proposal writing agent with structured guidelines ([28593ff](https://github.com/kingkong0905/my-claude-code/commit/28593fff7ebb77d88d0c1238e9c5ea2ffd2c5063))
+* **proposal-writer:** add proposal writing agent with structured guidelines ([f4b9620](https://github.com/kingkong0905/my-claude-code/commit/f4b962006afc78d77631122c15a9eab743f3ff90))
+
+
+### Bug Fixes
+
+* **docs:** remove maxResults parameter from JQL examples in SKILL.md ([8e5d17e](https://github.com/kingkong0905/my-claude-code/commit/8e5d17ef43dc8f0339aca98361e60a3e3187166b))
+* **hooks:** wrap commands in bash for improved execution context ([0182bf5](https://github.com/kingkong0905/my-claude-code/commit/0182bf5eb3096fce92e5dae43d98fbc39079afba))
+
 ## [0.6.0](https://github.com/kingkong0905/my-claude-code/compare/v0.5.0...v0.6.0) (2026-02-27)
 
 
