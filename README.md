@@ -156,8 +156,7 @@ To debug interactively:
 ```bash
 npx mcporter call atlassian.searchJiraIssuesUsingJql \
   cloudId:'<CLOUD_ID>' \
-  jql:'assignee = currentUser() AND status = "In Progress"' \
-  maxResults:5
+  jql:'assignee = currentUser() AND status = "In Progress"'
 ```
 
 **Timeouts on slow networks**
