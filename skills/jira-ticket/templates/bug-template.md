@@ -49,7 +49,7 @@ h2. Acceptance Criteria
 
 ---
 
-## Filled Example
+## Good Example
 
 ```
 h2. Overview
@@ -94,6 +94,54 @@ h2. Acceptance Criteria
 # Submitting with invalid data (e.g. missing required fields) shows an inline error, not a spinner.
 # A regression test is added covering the save flow end-to-end.
 ```
+
+_Why this works:_
+
+- Overview answers "what is broken and who is affected" in two sentences
+- Context gives enough signal to triage without reading the whole ticket (severity, volume, deploy correlation)
+- Steps to Reproduce are atomic — any engineer or QA can follow them cold
+- Expected vs Actual is explicit — not left for the reader to infer
+- Error output is pasted verbatim in a panel — the key field `'email_alerts_v2'` immediately points to a rename mismatch
+- AC goes beyond "fix the bug" — covers the confirmation UX, API contract, error handling, and regression test
+
+---
+
+## Bad Example
+
+```
+## Notifications Bug
+
+The notifications settings page is broken. Users reported it doesn't work.
+Please fix ASAP.
+
+## Steps
+
+1. Go to settings
+2. Try to save
+3. It doesn't work
+
+Expected: It works
+Actual: It doesn't work
+
+## Fix
+
+- Fix the save button
+- Make sure it saves correctly
+- Check why it's broken
+```
+
+_Why this fails:_
+
+| Problem                     | Detail                                                                                   |
+| --------------------------- | ---------------------------------------------------------------------------------------- |
+| Wrong markup                | Uses Markdown (`##`, `1.`) instead of Jira wiki markup (`h2.`, `#`)                      |
+| Overview is vague           | "doesn't work" tells the engineer nothing; no scope of impact, no user count             |
+| Steps are too coarse        | "Go to settings" — which settings? "Try to save" — save what?                            |
+| Expected/Actual is circular | "It works" / "It doesn't work" communicates no information                               |
+| No error output             | The 422 response body with the invalid field name is the most useful clue — it's missing |
+| No context                  | No severity, environment, first-observed date, or related tickets                        |
+| AC items are tasks          | "Fix the save button" is a task, not a verifiable outcome                                |
+| No regression criterion     | Bug will silently re-emerge with no safety net                                           |
 
 ---
 
