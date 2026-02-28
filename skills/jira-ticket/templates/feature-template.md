@@ -38,7 +38,7 @@ h2. Acceptance Criteria
 
 ---
 
-## Filled Example
+## Good Example
 
 ```
 h2. Overview
@@ -67,6 +67,55 @@ h2. Acceptance Criteria
 # After a successful password reset, the user is redirected to the login page with a confirmation message.
 # Resetting a password invalidates all existing sessions for that user.
 ```
+
+_Why this works:_
+
+- Overview is outcome-focused — no implementation details
+- Context explains the business pain with a concrete metric (~50 requests/week)
+- Out of scope prevents scope creep before the ticket is even picked up
+- Every AC item is independently verifiable by a tester who did not write the code
+- "must" language is implicit through numbered assertions — no ambiguous "should"
+- Security edge case (no email enumeration) is explicitly called out as a requirement
+
+---
+
+## Bad Example
+
+```
+## Forgot Password Feature
+
+Implement forgot password functionality so users can reset their password.
+
+## Background
+
+We need this because users forget their passwords and contact support.
+
+### What to build:
+- Add forgot password link to login
+- Create password reset endpoint
+- Send reset email
+- Update the user's password
+
+## Acceptance Criteria
+
+- Implement the /api/auth/forgot-password endpoint
+- The email should send correctly
+- Password reset should work
+- It should be secure
+- Tests should pass
+```
+
+_Why this fails:_
+
+| Problem                          | Detail                                                                           |
+| -------------------------------- | -------------------------------------------------------------------------------- |
+| Wrong markup                     | Uses Markdown (`##`, `-`) instead of Jira wiki markup (`h2.`, `*`)               |
+| Overview is missing              | The "Background" section explains the _symptom_, not the outcome being delivered |
+| AC items are tasks, not outcomes | "Implement the endpoint" is a task; a tester cannot verify it pass/fail          |
+| Vague language                   | "should send correctly", "should work", "should be secure" are unverifiable      |
+| No out of scope                  | Engineers will debate SMS recovery, admin resets, social login mid-sprint        |
+| No constraints                   | Token expiry, single-use links, session invalidation — all absent                |
+| No references                    | No design link, no related tickets, no affected components                       |
 
 ---
 

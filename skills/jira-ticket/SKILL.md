@@ -39,6 +39,8 @@ Ask only for what is not already clear:
 - Who is affected (users, systems, teams)?
 - What is explicitly out of scope?
 - Any blocking dependencies or related tickets?
+- **Is this ticket a sub-task of an existing ticket?** If yes, get the parent issue key (e.g. `PROJ-123`). The ticket will be created as a Sub-task under that parent.
+- **Are there any related/relevant tickets that should be linked?** If yes, collect the issue keys and the relationship type (e.g. "relates to", "blocks", "is blocked by", "duplicates").
 
 ### 3. Investigate the codebase with Serena
 
@@ -160,19 +162,48 @@ npx mcporter call atlassian.getJiraProjectIssueTypesMetadata \
   projectKey:'<PROJECT_KEY>'
 ```
 
-4. Map the ticket type from step 1 to a valid issue type ID.
+3. Map the ticket type from step 1 to a valid issue type ID.
 
-5. Create the ticket:
+   > **If the user provided a parent ticket key**: override the issue type to `Sub-task` (use the Sub-task type ID from the metadata). The `parent` field must be set to the parent issue key.
 
-```bash
-npx mcporter call atlassian.createJiraIssue \
-  projectKey:'<PROJECT_KEY>' \
-  issueType:'<ISSUE_TYPE_ID>' \
-  summary:'<TICKET_TITLE>' \
-  description:'<MARKDOWN_BODY>'
-```
+4. Create the ticket:
 
-6. Return the created issue key and URL to the user.
+   **Standard ticket:**
+
+   ```bash
+   npx mcporter call atlassian.createJiraIssue \
+     projectKey:'<PROJECT_KEY>' \
+     issueType:'<ISSUE_TYPE_ID>' \
+     summary:'<TICKET_TITLE>' \
+     description:'<MARKDOWN_BODY>'
+   ```
+
+   **Sub-task (parent ticket provided):**
+
+   ```bash
+   npx mcporter call atlassian.createJiraIssue \
+     projectKey:'<PROJECT_KEY>' \
+     issueType:'<SUBTASK_ISSUE_TYPE_ID>' \
+     summary:'<TICKET_TITLE>' \
+     description:'<MARKDOWN_BODY>' \
+     parent:'<PARENT_ISSUE_KEY>'
+   ```
+
+5. Link to related tickets (if the user provided relevant ticket keys):
+
+   After the ticket is created, call the Jira issue link API for each related ticket:
+
+   ```bash
+   npx mcporter call atlassian.fetch \
+     url:'https://<domain>.atlassian.net/rest/api/3/issueLink' \
+     method:'POST' \
+     body:'{"type":{"name":"<LINK_TYPE>"},"inwardIssue":{"key":"<NEW_ISSUE_KEY>"},"outwardIssue":{"key":"<RELATED_ISSUE_KEY>"}}'
+   ```
+
+   Common `LINK_TYPE` values: `"Relates"`, `"Blocks"`, `"Cloners"`, `"Duplicate"`.
+   Repeat for each related ticket.
+
+6. Return the created issue key and URL to the user. If the ticket is a sub-task, also confirm which parent it was filed under. If tickets were linked, list each linked issue key and the relationship applied.
 
 > **Note on format**: The `description` field sent to `createJiraIssue` must be **Markdown**, not Jira wiki markup. Convert the draft before submitting.
 
