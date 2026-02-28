@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.10.0](https://github.com/kingkong0905/my-claude-code/compare/v0.9.0...v0.10.0) (2026-02-28)
+
+
+### Features
+
+* Add codeowner and funding ([8298db1](https://github.com/kingkong0905/my-claude-code/commit/8298db109e27e25ff54acb70d683485aa3587caf))
+* Update jira ticket skills ([9a6678d](https://github.com/kingkong0905/my-claude-code/commit/9a6678d7554223802c30be27bc88daf7907e83bd))
+
 ## [0.9.0](https://github.com/kingkong0905/my-claude-code/compare/v0.8.0...v0.9.0) (2026-02-27)
 
 
